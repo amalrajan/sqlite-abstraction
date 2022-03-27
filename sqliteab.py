@@ -18,6 +18,27 @@ class SQLiteAb:
     def __xi(self, text) -> string:
         return f'{text}' if f'{text}'.isdigit() else f"'{text}'"
 
+    def decorator(func):
+        """
+        Decorator function
+
+        Args:
+            func: A function
+        """
+
+        def wrapper(self, *args, **kwargs):
+            query = f'''
+                SELECT 1 FROM {self._table}
+            '''
+            try:
+                res = self._cursor.execute(query)
+            except sqlite3.OperationalError:
+                return None
+            else:
+                return func(self)
+
+        return wrapper
+
     def enable_logging(self):
         """
         Enable console logging
@@ -37,6 +58,7 @@ class SQLiteAb:
         logging.debug(f'Setting table to {table}')
         self._table = table
 
+    @decorator
     def get_all_data(self) -> tuple:
         """
         Gets all data as a tuple
@@ -53,7 +75,8 @@ class SQLiteAb:
         res = self._cursor.execute(query)
 
         return res
-
+    
+    @decorator
     def get_data(self, column_name, column_val) -> tuple:
         """
         Get a tuple of rows matching a given condition
@@ -76,23 +99,6 @@ class SQLiteAb:
 
         return res
 
-    def table_exists(self) -> bool:
-        """
-        Checks if a table exists
-
-        Returns:
-            Boolean: _description_
-        """
-        query = f'''
-            SELECT 1 FROM {self._table}
-        '''
-
-        logging.debug(query)
-
-        res = self._cursor.execute(query)
-
-        return True if res else False
-
     def create_table(self, mp) -> None:
         """
         Create a table
@@ -112,6 +118,7 @@ class SQLiteAb:
         self._cursor.execute(query)
         self._connection.commit()
 
+    @decorator
     def insert_row(self, mp) -> None:
         """
         Inserts a row into a table
@@ -135,6 +142,7 @@ class SQLiteAb:
         self._cursor.execute(query)
         self._connection.commit()
 
+    @decorator
     def truncate_table(self) -> None:
         """
         Truncate the table
@@ -146,6 +154,7 @@ class SQLiteAb:
         self._cursor.execute(query)
         self._connection.commit()
 
+    @decorator
     def delete_row(self, column_name, column_val) -> None:
         """
         Delete rows based on condition
@@ -164,6 +173,7 @@ class SQLiteAb:
         self._cursor.execute(query)
         self._connection.commit()
 
+    @decorator
     def modify_row(self, column_name, column_val, mp) -> None:
         """
         Updates a single row
@@ -188,6 +198,7 @@ class SQLiteAb:
         self._cursor.execute(query)
         self._connection.commit()
 
+    @decorator
     def drop_table(self) -> None:
         """
         Drop a table
