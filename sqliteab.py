@@ -1,5 +1,6 @@
 import logging
 import sqlite3
+import string
 
 
 class SQLiteAb:
@@ -14,7 +15,7 @@ class SQLiteAb:
         self._cursor = self._connection.cursor()
         self._table = None
 
-    def __xi(self, text):
+    def __xi(self, text) -> string:
         return f'{text}' if f'{text}'.isdigit() else f"'{text}'"
 
     def enable_logging(self):
@@ -33,9 +34,10 @@ class SQLiteAb:
         Args:
             table (string): _description_
         """
+        logging.debug(f'Setting table to {table}')
         self._table = table
 
-    def get_all_data(self):
+    def get_all_data(self) -> tuple:
         """
         Gets all data as a tuple
 
@@ -46,11 +48,13 @@ class SQLiteAb:
             SELECT * FROM {self._table}
         '''
 
+        logging.debug(query)
+
         res = self._cursor.execute(query)
 
         return res
 
-    def get_data(self, column_name, column_val):
+    def get_data(self, column_name, column_val) -> tuple:
         """
         Get a tuple of rows matching a given condition
 
@@ -72,7 +76,7 @@ class SQLiteAb:
 
         return res
 
-    def table_exists(self):
+    def table_exists(self) -> bool:
         """
         Checks if a table exists
 
@@ -83,11 +87,13 @@ class SQLiteAb:
             SELECT 1 FROM {self._table}
         '''
 
+        logging.debug(query)
+
         res = self._cursor.execute(query)
 
         return True if res else False
 
-    def create_table(self, mp):
+    def create_table(self, mp) -> None:
         """
         Create a table
 
@@ -106,7 +112,7 @@ class SQLiteAb:
         self._cursor.execute(query)
         self._connection.commit()
 
-    def insert_row(self, mp):
+    def insert_row(self, mp) -> None:
         """
         Inserts a row into a table
 
@@ -129,16 +135,18 @@ class SQLiteAb:
         self._cursor.execute(query)
         self._connection.commit()
 
-    def truncate_table(self):
+    def truncate_table(self) -> None:
         """
         Truncate the table
         """
         query = f'DELETE FROM {self._table}'
 
+        logging.debug(query)
+
         self._cursor.execute(query)
         self._connection.commit()
 
-    def delete_row(self, column_name, column_val):
+    def delete_row(self, column_name, column_val) -> None:
         """
         Delete rows based on condition
 
@@ -156,7 +164,7 @@ class SQLiteAb:
         self._cursor.execute(query)
         self._connection.commit()
 
-    def modify_row(self, column_name, column_val, mp):
+    def modify_row(self, column_name, column_val, mp) -> None:
         """
         Updates a single row
 
@@ -180,17 +188,20 @@ class SQLiteAb:
         self._cursor.execute(query)
         self._connection.commit()
 
-    def drop_table(self):
+    def drop_table(self) -> None:
         """
         Drop a table
         """
         query = f'DROP TABLE {self._table}'
 
+        logging.debug(query)
+
         self._cursor.execute(query)
         self._connection.commit()
 
-    def close_connection(self):
+    def close_connection(self) -> None:
         """
         Close SQLite connection
         """
+        logging.debug('Closing database connection')
         self._connection.close()
